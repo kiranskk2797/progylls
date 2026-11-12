@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create an account · ProGylls</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,700;112,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#fffcf8;color:#172033;font:16px/1.55 "IBM Plex Sans",system-ui,sans-serif}
+header{border-bottom:1px solid #e9e3dc;padding:20px clamp(20px,6vw,100px)}
+.brand,h1,h2{font-family:Archivo,system-ui,sans-serif;font-weight:800}.brand{display:inline-flex;align-items:center;gap:10px;font-size:22px;letter-spacing:-.05em}.mark{display:grid;place-items:center;background:#f47721;width:35px;height:35px;border-radius:9px}
+main{max-width:1090px;margin:clamp(36px,8vh,96px) auto;padding:0 28px;display:grid;grid-template-columns:1fr 1fr;gap:clamp(44px,7vw,106px);align-items:center}
+aside{background:#fff0e1;border:1px solid #ebd9c8;border-radius:24px;overflow:hidden}
+.poster{position:relative;padding:34px 34px 12px;background:radial-gradient(ellipse at 70% 90%,#ffba76,transparent 73%),#ffebd6}
+.poster h2{margin:0;font-size:clamp(32px,4.3vw,58px);letter-spacing:-.06em;line-height:1.02;max-width:9em}
+.gart{display:block;width:100%;max-height:205px;--accent-icon:#e6691a;--accent-hi:#ffbe7b}
+figcaption{padding:18px 32px 22px;border-top:1px solid #ebd9c8;color:#473b30}figure{margin:0}
+h1{font-size:clamp(30px,4vw,43px);letter-spacing:-.055em;line-height:1.12;margin:0 0 10px}p{margin:0 0 22px;color:#545d6d}
+label{display:block;font-weight:600;margin:18px 0 6px}input{width:100%;min-height:49px;padding:11px 13px;border:1px solid #9298a4;background:white;border-radius:9px;font:inherit;color:#172033}.password{position:relative}.password input{padding-right:74px}
+button,a{font:inherit}button{cursor:pointer}.show{position:absolute;right:4px;top:3px;height:43px;border:0;background:transparent;padding:0 12px;color:#505867;font-weight:600}
+small{display:block;margin-top:6px;color:#5f6878}.primary{width:100%;border:1px solid #da6414;border-radius:10px;background:#f47721;color:#172033;font-weight:700;padding:13px;margin:22px 0 16px}.primary:hover{background:#ff8d40}.primary:disabled{opacity:.65}
+a{color:#9e3b06;font-weight:600;text-underline-offset:3px}.switch{margin:0;text-align:center}.error{color:#a12727;margin:12px 0 0}.error:empty{display:none}
+#forgotLink{display:block;width:fit-content;margin:10px 0 0 auto;font-size:14px}#notice:empty{display:none}:focus-visible{outline:3px solid #9b430c;outline-offset:3px}[hidden]{display:none!important}
+@media(max-width:710px){header{padding:15px 22px}main{display:block;max-width:460px;margin:36px auto;padding:0 24px}aside{display:none}}
+</style></head><body>
+<header><div class="brand"><span class="mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg></span>ProGylls</div></header>
+<main><aside aria-label="About ProGylls"><figure><div class="poster"><h2>Your product<br>practice gym.</h2>
+<svg class="gart" viewBox="0 0 420 200" aria-hidden="true"><defs><radialGradient id="gglow"><stop offset="0" stop-color="var(--accent-icon)" stop-opacity=".35"/><stop offset="1" stop-color="var(--accent-icon)" stop-opacity="0"/></radialGradient><linearGradient id="plate" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a3a42"/><stop offset="1" stop-color="#0d151a"/></linearGradient><linearGradient id="barg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--accent-hi,#5ad8c0)"/><stop offset="1" stop-color="var(--accent-icon)" stop-opacity=".6"/></linearGradient></defs><ellipse cx="210" cy="120" rx="190" ry="90" fill="url(#gglow)"/><ellipse cx="210" cy="176" rx="120" ry="10" fill="#000" opacity=".25"/><g transform="rotate(12 210 110)"><rect x="140" y="98" width="140" height="22" rx="11" fill="url(#barg)"/><ellipse cx="150" cy="108" rx="38" ry="58" fill="url(#plate)"/><ellipse cx="162" cy="108" rx="34" ry="54" fill="url(#plate)" stroke="var(--accent-icon)" stroke-opacity=".7" stroke-width="3"/><ellipse cx="166" cy="108" rx="12" ry="18" fill="#0b1216"/><ellipse cx="270" cy="108" rx="34" ry="54" fill="url(#plate)"/><ellipse cx="282" cy="108" rx="30" ry="48" fill="url(#plate)" stroke="var(--accent-icon)" stroke-opacity=".9" stroke-width="5"/><ellipse cx="286" cy="108" rx="10" ry="15" fill="#0b1216"/></g></svg>
+</div><figcaption>Learn a PM concept, test it in a Quick Drill, then put it to work in the Gym Room.</figcaption></figure></aside>
+<section aria-labelledby="heading"><h1 id="heading">Create your account</h1><p id="subtitle">Choose your PM stage, then take a short tour.</p>
+<form id="account"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" required maxlength="254">
+<a href="#forgot" id="forgotLink" hidden>Forgot password?</a><label for="password">Password</label><div class="password"><input id="password" name="password" type="password" autocomplete="new-password" required maxlength="256" minlength="10" aria-describedby="hint"><button id="show" class="show" type="button" aria-label="Show password">Show</button></div>
+<small id="hint">Use at least 10 characters.</small><p id="error" class="error" role="alert"></p>
+<button type="submit" class="primary" id="submit">Create account</button></form>
+<p id="notice" role="status"></p><p class="switch"><span id="switchText">Already have an account?</span> <a id="switchLink" href="#login">Log in</a></p>
+</section></main>
+<script>
+const byId=id=>document.getElementById(id);
+const password=byId('password');
+const screens={
+ signup:['Create your account','Choose your PM stage, then take a short tour.','Create account'],
+ login:['Welcome back','Log in to continue your PM practice.','Log in'],
+ forgot:['Forgot your password?','Enter the email you used to create your ProGylls account.','Send reset link'],
+ reset:['Choose a new password','Enter a new password for your ProGylls account.','Save new password']
+};
+function mode(){
+ if(location.pathname==='/recovery' && location.hash.startsWith('#reset/'))return 'reset';
+ return ['#login','#forgot'].includes(location.hash)?location.hash.slice(1):'signup';
+}
+function visibility(visible){
+ password.type=visible?'text':'password';
+ byId('show').textContent=visible?'Hide':'Show';
+ byId('show').setAttribute('aria-label',visible?'Hide password':'Show password');
+}
+function display(){
+ const current=mode(),login=current==='login',forgot=current==='forgot',reset=current==='reset';
+ const [heading,subtitle,action]=screens[current];
+ document.title=heading+' · ProGylls';
+ byId('heading').textContent=heading;byId('subtitle').textContent=subtitle;byId('submit').textContent=action;
+ byId('switchText').textContent=login?'New to ProGylls?':current==='signup'?'Already have an account?':'';
+ byId('switchLink').textContent=login?'Create an account':forgot||reset?'Back to login':'Log in';
+ byId('switchLink').href=login?'/#signup':'/#login';
+ byId('forgotLink').hidden=!(login||reset);
+ byId('forgotLink').href='/#forgot';
+ byId('forgotLink').textContent=reset?'Request a new link':'Forgot password?';
+ byId('email').hidden=reset;byId('email').disabled=reset;
+ document.querySelector('label[for=email]').hidden=reset;
+ document.querySelector('label[for=password]').hidden=forgot;
+ password.parentElement.hidden=forgot;password.disabled=forgot;
+ password.value='';visibility(false);
+ password.autocomplete=login?'current-password':'new-password';password.minLength=login?1:10;
+ byId('hint').hidden=login||forgot;byId('error').textContent='';byId('notice').textContent='';
+}
+byId('show').onclick=()=>visibility(password.type==='password');
+window.addEventListener('hashchange',()=>{display();(mode()==='reset'?password:byId('email')).focus()});
+byId('account').onsubmit=async event=>{
+ event.preventDefault();const current=mode(),submit=byId('submit');
+ if(submit.disabled)return;
+ submit.disabled=true;byId('error').textContent='';
+ try{
+  const fields={email:byId('email').value,password:password.value};
+  if(current==='reset')fields.token=location.hash.slice('#reset/'.length);
+  if(current==='forgot')delete fields.password;
+  const response=await fetch('/'+current,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(fields)});
+  if(mode()!==current)return;
+  if(response.ok){
+   if(current==='forgot'){
+    byId('notice').textContent='If an account uses that email, check its inbox for a reset link. The link expires in 15 minutes.';
+   }else if(current==='reset'){
+    history.replaceState(null,'','/#login');display();
+    byId('notice').textContent='Your password has been updated. Log in with your new password.';
+    byId('email').focus();
+   }else{location.replace(current==='login'?'/app':'/app#tour')}
+   return;
+  }
+  byId('error').textContent=await response.text();
+ }catch{byId('error').textContent='Could not connect. Check that ProGylls is running, then try again.'}
+ finally{submit.disabled=false}
+};
+display();
+</script></body></html>

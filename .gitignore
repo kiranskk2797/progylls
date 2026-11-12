@@ -1,0 +1,9 @@
+.env
+.env.*
+.progylls-data/
+*.sqlite*
+__pycache__/
+node_modules/
+test-results/
+*.pem
+*.key
