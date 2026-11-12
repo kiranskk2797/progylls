@@ -1,9 +1,35 @@
+# Node and Vite
+node_modules/
+dist/
+*.local
+
+# Environment files
 .env
 .env.*
+!.env.example
+
+# Logs and temporary files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+tmp/
+temp/
+*.tmp
+*.temp
+*.swp
+
+# Local data and secrets
 .progylls-data/
-*.sqlite*
-__pycache__/
-node_modules/
-test-results/
+.secrets/
+secrets/
 *.pem
 *.key
+*.p12
+*.pfx
+
+# Python
+__pycache__/
+*.sqlite*
+test-results/
