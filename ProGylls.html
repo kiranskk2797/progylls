@@ -1712,6 +1712,21 @@ function guideView(app,id){
   body='<div class="done-ic">'+IC.check+'</div><h2>'+(read?'Nice work':'You made it through')+'</h2><p class="muted">'+(read?'You have read this guide. Time to practise it.':'Mark it read to earn 10 XP.')+'</p>'+
    (read?next||'<button class="btn primary big" data-go="reads">Back to Pre-Reads</button>':'<button class="btn primary big" id="markRead">Mark as read · +10 XP</button>')+(read?qc:'');
  }
+ if(id==='framing'&&!last){
+  const notes=[
+   'An observation describes what you measured. A hypothesis suggests a reason you can test.',
+   'Illustrative interview data: 52 of 100 new customers ordered, compared with 70 of 100 returning customers. The observed gap is 18 percentage points.',
+   'A fee surprise could explain some exits. Ask customers what total they expected, and compare their answers with the displayed total.',
+   'Another hypothesis is payment failure. Inspect provider responses for sessions that reached payment.',
+   'Common mistake: blaming fees for every exit. Try this: state one observation, one possible cause and one piece of evidence that would change your mind.'
+  ];
+  body+='<aside class="callout"><strong>Swiggy checkout price shock</strong><p>'+notes[GV.i]+'</p></aside>';
+ }
+ if(read&&last&&id==='framing')body+='<p><button class="btn primary" data-qe="qd-swiggy">Swiggy checkout price shock · Quick Drill</button></p>';
+ if(GV.i===0){
+  body+=lessonResources.filter(r=>r.guide===id).map(r=>'<aside class="qe-det"><a class="link" target="_blank" rel="noopener noreferrer" href="'+esc(r.url)+'">Read or watch · '+esc(r.title)+'</a><p><strong>Try this.</strong> '+esc(r.exercise)+'</p></aside>').join('');
+  if(id==='jtbd')body+='<button class="link" data-go="reads" data-arg="framing">Problem Framing · Swiggy checkout price shock</button>';
+ }
  app.innerHTML='<div class="guide-step"><div class="crumb"><button data-go="reads">Learn</button><span>›</span><button data-go="reads">Pre-Reads</button><span>›</span><span>'+esc(g.t)+'</span></div>'+
  '<div class="g-head"><h1>'+esc(g.t)+'</h1>'+(TTS_OK&&!last?'<div class="tts"><button id="ttsBtn" class="'+(TTS.on?'on':'')+'" aria-label="Listen to this guide">'+(TTS.on&&!TTS.paused?IC.pause||'':IC.headphones)+(TTS.on?(TTS.paused?'Resume':'Pause'):'Listen')+'</button>'+(TTS.on?'<button class="spd" id="ttsSpd" aria-label="Reading speed">'+TTS.rate+'x</button>':'')+'</div>':'')+'</div>'+
  '<div class="steps-bar">'+steps.concat([0]).map((_,i)=>'<i class="'+(i<GV.i?'done':i===GV.i?'on':'')+'"></i>').join('')+'</div>'+
@@ -2509,8 +2524,92 @@ const TYPE_LABEL={mcq:'Single select',tf:'True or false',apply:'Quick applicatio
 const OPEN_TYPES=['decide','case'];
 const XPB={mcq:5,tf:4,apply:7,blanks:6,match:8,short:6,flashcard:2,data:10,diagnose:12,decide:15,prioritize:12,case:25};
 const PILLAR={reads:{n:'Pre-Reads',go:'reads',src:'Pre-Read',kind:'read'},drill:{n:'Quick Drill',go:'drill',src:'Quick Drill',kind:'drill'},gym:{n:'Case Simulations',go:'cases',src:'Case simulation',kind:'gym'}};
-const QORDER=['pre-nsm','pre-funnels','pre-retention','qd-metrics','gr-basketly','pre-jtbd','pre-framing','qd-product','pre-prioritization','qd-prio','gr-fittrack'];
+const QORDER=['pre-nsm','pre-funnels','pre-retention','qd-metrics','gr-basketly','pre-jtbd','pre-framing','qd-product','qd-swiggy','gr-swiggy','pre-prioritization','qd-prio','gr-fittrack'];
 
+const swiggyEvidence = {
+ id:'E1', t:'Illustrative interview data', b:'Fictional checkout sessions grouped by customer type.',
+ tbl:[['Checkout step','New customers','Returning customers'],['Started checkout','100','100'],['Saw payable total','90','95'],['Attempted payment','65','80'],['Confirmed order','52','70']]
+};
+function checkoutTable(){
+ return '<div class="qe-det" style="overflow-x:auto">'+evHTML(swiggyEvidence)+'</div>';
+}
+qdef({id:'qd-swiggy',pillar:'drill',skill:'product',level:'Beginner',title:'Swiggy checkout price shock',desc:'Compare checkout starts, investigate possible causes and complete two branches of the checkout flow.',items:[
+ {id:'sw-gap',type:'mcq',tag:'evidence',q:'Which observation can you defend from these counts?',opts:[
+ O('New customers convert 18 percentage points less often.',1,'70 of 100 returning customers ordered versus 52 of 100 new customers. The difference is 18 percentage points.'),
+ O('18 new customers left because of the fee.',0,'A difference in order counts cannot tell us why individual customers left.'),
+ O('Returning customers converted 18% more often.',0,'18 is the percentage-point difference. A relative increase would use 52% as its denominator.')]},
+ {id:'sw-causes',type:'mcq',multi:true,tag:'root-cause',q:'Select two plausible causes to investigate.',opts:[
+ O('Unexpected fees discourage some customers before payment.',1,'Compare the fee people expect with what they see at the payable total.'),
+ O('Payment provider errors prevent some attempted orders.',1,'Match payment attempts to provider responses and confirmed orders.'),
+ O('All 48 non-orders were payment failures.',0,'Only 13 customers attempted payment without ordering.'),
+ O('Every customer saw the payable total.',0,'Only 90 of 100 new customers reached that event.')]},
+ {id:'sw-convert',type:'mcq',tag:'conversion',q:'What percentage of new checkout starts became confirmed orders?',opts:[
+ O('80%',0,'52 orders out of 65 payment attempts is 80%. Checkout-start conversion uses all 100 starts.'),
+ O('52%',1,'52 confirmed orders ÷ 100 checkout starts × 100 = 52%.'),
+ O('65%',0,'65 of 100 attempted payment. Confirmation is the final event in this calculation.')]},
+ {id:'sw-flow',type:'match',tag:'funnel',q:'Complete the checkout flow. Tap a branch point, then its possible outcome.',pairs:[
+ ['Sees payable total → leaves before paying','No payment attempt to investigate'],['Attempts payment → provider returns an error','Investigate the failed payment'],['Attempts payment → order confirmation','Count a completed order']],why:'A pre-payment exit and a payment error require different evidence.'}
+]});
+const swiggyUpdate='Provider errors were confirmed in 10 of the 13 new-customer sessions that attempted payment without ordering.';
+qdef({id:'gr-swiggy',pillar:'gym',skill:'product',level:'Beginner',title:'Swiggy checkout price shock',desc:'Choose an investigation and revise your reasoning when new evidence arrives.',focus:['evidence','assumptions'],items:[
+ {id:'sw-case',type:'case',tag:'evidence',q:'What changes and what remains unknown?',brief:swiggyUpdate,evidence:[swiggyEvidence],
+ sections:[{k:'rec',l:'Your follow-up',h:'Explain how you would update your investigation and which customers the new evidence covers.',min:12}],
+ lookFor:{framing:'Separate the two exit points.',evidence:'Use the 10 confirmed errors and the 13 attempted payments without orders.',reasoning:'Explain why the update changes your next step.',assumptions:'Identify an unresolved cause and a way to test it.',tradeoffs:'Say which investigation you would defer.',comms:'Lead with your decision.'},
+ model:'I’d check the provider errors first. We have confirmed errors in ten sessions, so I’d trace the error codes and check whether retries produced orders later. That evidence covers customers who tried to pay. It tells me little about the 25 who saw the total and never attempted payment. I’d verify those events and ask a few of those customers what they expected to pay before proposing a fee change.'}
+]});
+function firstInvestigation(app,run){
+ app.innerHTML='<section class="card qe-card"><div class="eyebrow">Gym Room · Swiggy checkout price shock</div>'+checkoutTable()+'<h2><label for="firstCall">What would you investigate first, and why?</label></h2><p>Choose the evidence you would check. Fee expectations, failed payments and event quality are all possible starting points.</p><form id="saveCall"><textarea class="qe-ta" id="firstCall" required maxlength="1200" rows="4"></textarea><button class="btn primary">Save and reveal evidence</button></form></section>';
+ const input=app.querySelector('textarea');input.value=run.firstDraft||'';
+ input.oninput=()=>{run.firstDraft=input.value;save()};
+ app.querySelector('form').onsubmit=e=>{e.preventDefault();if(!input.value.trim())return;run.firstCall=input.value.trim();delete run.firstDraft;save();render()};
+}
+
+
+const lessonResources=[
+  {
+    "guide": "jtbd",
+    "title": "Product manager capability framework",
+    "author": "UK Government",
+    "exercise": "Turn one associate PM responsibility into an observable outcome. Specify what the learner will produce and how a reviewer can check it.",
+    "url": "https://understand-digital-data-roles-skills.service.gov.uk/role/product-manager/"
+  },
+  {
+    "guide": "framing",
+    "title": "Product interview handbook",
+    "author": "Atlassian",
+    "exercise": "Give your checkout decision in 60 seconds. Answer a stakeholder who asks why you would delay a fee redesign.",
+    "url": "https://www.atlassian.com/company/careers/resources/career-growth/product-managers"
+  },
+  {
+    "guide": "funnels",
+    "title": "User Journeys vs. User Flows",
+    "author": "Nielsen Norman Group",
+    "exercise": "Draw checkout from start to confirmation. Mark one exit before paying and one after a provider error.",
+    "url": "https://www.youtube.com/watch?v=dsviXwJwslI"
+  },
+  {
+    "guide": "jtbd",
+    "title": "Continuous Discovery Habits reading guide",
+    "author": "Teresa Torres, Product Talk",
+    "exercise": "Connect one learner need to two possible solutions. Design a small test of the assumption they share.",
+    "url": "https://www.producttalk.org/lets-read-continuous-discovery-habits-together-january-2026/"
+  },
+  {
+    "guide": "prioritization",
+    "title": "RICE prioritization",
+    "author": "Intercom",
+    "exercise": "Compare showing fees earlier with explaining fees at checkout. Name the assumption that could reverse your ranking.",
+    "url": "https://www.intercom.com/blog/rice-simple-prioritization-for-product-managers"
+  },
+  {
+    "guide": "prioritization",
+    "title": "Story Mapping: Watch Jeff Create a Story Map",
+    "author": "Jeff Patton",
+    "exercise": "Map attempt, review and revision in sequence. Draw a release line below the smallest usable interview practice loop.",
+    "url": "https://jpattonassociates.com/story-mapping-watch-jeff-create-a-story-map/"
+  }
+]
+;
 const QI={};
 Object.values(QSESS).forEach(s=>s.items.forEach(it=>{it.sid=s.id;QI[it.id]=it}));
 
@@ -2536,6 +2635,7 @@ const fmtNum=n=>(Math.round(n*100)/100).toLocaleString('en');
 let QE={sid:null,run:null,ui:null,iid:null,busy:false,hint:false,err:null,t0:0,focus:null};
 function qeNewRun(sid){
  const s=QSESS[sid],q=QS(),prev=q.run[sid];
+ if(prev&&['qd-swiggy','gr-swiggy'].includes(sid))(q.swiggyHistory??=[]).push(prev);
  q.run[sid]={sid,pillar:s.pillar,stage:'main',queue:s.items.map(i=>i.id),pos:0,retry:[],res:{},cur:null,xp:0,ms:0,t0:Date.now(),tEnd:null,done:false,gl:{},n:((prev&&prev.n)||0)+1};
  save();track('qe_start',{sid});return q.run[sid];
 }
@@ -2645,7 +2745,7 @@ function qeCaseCard(sid){
  const s=QSESS[sid],st=qeSessStatus(sid),run=QS().run[sid];
  const types=[...new Set(s.items.map(i=>i.type))].map(t=>'<span class="tag">'+TYPE_LABEL[t]+'</span>').join('');
  const pct=st.k==='new'?0:Math.round((st.mastered||0)/st.total*100);
- const status=st.k==='new'?'Not started':st.k==='active'?st.mastered+' of '+st.total+' mastered':'Complete · '+st.first+' of '+st.total+' right first try';
+ const status=sid==='gr-swiggy'&&st.k==='done'?'Complete · self-assessed':st.k==='new'?'Not started':st.k==='active'?st.mastered+' of '+st.total+' mastered':'Complete · '+st.first+' of '+st.total+' right first try';
  const btn=st.k==='active'?'<button type="button" class="btn primary" data-qe="'+sid+'">Resume</button>':st.k==='done'?'<button type="button" class="btn" data-qe="'+sid+'" data-fresh="1">Practice again</button><button type="button" class="btn" data-go="qe" data-arg="'+sid+'">Summary</button>':'<button type="button" class="btn primary" data-qe="'+sid+'">Start '+IC.arrow+'</button>';
  return '<article class="card qe-case" data-entry="'+sid+'"><div class="spread" style="align-items:flex-start"><span class="tag acc">'+esc(skillName(s.skill))+' · '+esc(s.level)+'</span><span class="small muted">'+s.items.length+' steps</span></div><h3>'+esc(s.title)+'</h3><p class="small muted" style="margin:0">'+esc(s.desc)+'</p><div class="qe-chips">'+types+'</div><div><div class="qe-prog" role="progressbar" aria-label="'+esc(s.title)+' progress" aria-valuemin="0" aria-valuemax="'+st.total+'" aria-valuenow="'+(st.mastered||0)+'" aria-valuetext="'+esc(status)+'" style="margin:4px 0 6px"><i style="width:'+pct+'%"></i></div><div class="small muted">'+esc(status)+'</div></div><div class="row" style="margin-top:auto">'+btn+'</div></article>';
 }
@@ -2831,13 +2931,15 @@ QT.decide={
 };
 QT.case={
  side(it){return qeSide(it)},
- fresh(it){const prev=(QS().item[it.id]||{}).resp;return {texts:Object.assign({},prev&&prev.texts),revs:[],editing:false,fb:null}},
+ fresh(it){const prev=(QS().item[it.id]||{}).resp;return {texts:Object.assign({},it.id==='sw-case'?{}:prev&&prev.texts),revs:[],editing:false,fb:null}},
  locked:ui=>ui.checked&&!ui.editing,
- done:(it,ui)=>it.sections.every(s=>(ui.texts[s.k]||'').trim().length>=s.min),
- need(it,ui){const n=it.sections.filter(s=>(ui.texts[s.k]||'').trim().length<s.min).length;return n+' section'+(n===1?'':'s')+' still need'+(n===1?'s':'')+' at least '+it.sections[0].min+' characters'},
+ done:(it,ui)=>(it.id!=='sw-case'||RUB.every(d=>ui.self?.[d.k]!=null))&&it.sections.every(s=>(ui.texts[s.k]||'').trim().length>=s.min),
+ need(it,ui){const n=it.sections.filter(s=>(ui.texts[s.k]||'').trim().length<s.min).length;if(!n&&it.id==='sw-case')return 'Rate each rubric dimension';return n+' section'+(n===1?'':'s')+' still need'+(n===1?'s':'')+' at least '+it.sections[0].min+' characters'},
  body(it,ui){const lock=this.locked(ui),ev=qeEvList(it);
-  return it.sections.map(s=>{const n=(ui.texts[s.k]||'').trim().length;return '<div class="qe-fld"><label for="qeS_'+s.k+'">'+esc(s.l)+'</label><div class="hint" id="qeH_'+s.k+'">'+esc(s.h)+'</div><textarea id="qeS_'+s.k+'" data-sec="'+s.k+'" class="qe-ta" rows="3" maxlength="1200" aria-describedby="qeH_'+s.k+' qeC_'+s.k+'"'+(lock?' disabled':'')+'>'+esc(ui.texts[s.k]||'')+'</textarea><div class="qe-cnt'+(n>=s.min?' ok':'')+'" id="qeC_'+s.k+'">'+n+' / '+s.min+' characters minimum</div></div>'}).join('')},
- bind(it,ui){document.querySelectorAll('textarea[data-sec]').forEach(ta=>ta.addEventListener('input',()=>{const k=ta.dataset.sec,s=it.sections.find(x=>x.k===k);ui.texts[k]=ta.value;const n=ta.value.trim().length,c=$('#qeC_'+k);if(c){c.textContent=n+' / '+s.min+' characters minimum';c.classList.toggle('ok',n>=s.min)}qeSaveSoon();qeSync()}))},
+  const first=it.id==='sw-case'?'<p><strong>Your first investigation</strong></p><blockquote>'+esc(QE.run.firstCall)+'</blockquote>':'';
+  const self=it.id==='sw-case'?'<fieldset class="qe-fs"'+(lock?' disabled':'')+'><legend>Self-assessment</legend><p>Rate your own follow-up using the interview rubric.</p>'+RUB.map(d=>'<label class="qe-fld">'+d.n+' · '+esc(d.d)+' <select data-self="'+d.k+'"><option value="">Choose a rating</option>'+['0 · Missing','1 · Partial','2 · Supported'].map((v,i)=>'<option value="'+i+'"'+(ui.self?.[d.k]===i?' selected':'')+'>'+v+'</option>').join('')+'</select></label>').join('')+'</fieldset>':'';
+  return first+it.sections.map(s=>{const n=(ui.texts[s.k]||'').trim().length;return '<div class="qe-fld"><label for="qeS_'+s.k+'">'+esc(s.l)+'</label><div class="hint" id="qeH_'+s.k+'">'+esc(s.h)+'</div><textarea id="qeS_'+s.k+'" data-sec="'+s.k+'" class="qe-ta" rows="3" maxlength="1200" aria-describedby="qeH_'+s.k+' qeC_'+s.k+'"'+(lock?' disabled':'')+'>'+esc(ui.texts[s.k]||'')+'</textarea><div class="qe-cnt'+(n>=s.min?' ok':'')+'" id="qeC_'+s.k+'">'+n+' / '+s.min+' characters minimum</div></div>'}).join('')+self},
+ bind(it,ui){document.querySelectorAll('[data-self]').forEach(el=>el.onchange=()=>{ui.self??={};ui.self[el.dataset.self]=el.value===''?null:Number(el.value);qeSave();qeSync()});document.querySelectorAll('textarea[data-sec]').forEach(ta=>ta.addEventListener('input',()=>{const k=ta.dataset.sec,s=it.sections.find(x=>x.k===k);ui.texts[k]=ta.value;const n=ta.value.trim().length,c=$('#qeC_'+k);if(c){c.textContent=n+' / '+s.min+' characters minimum';c.classList.toggle('ok',n>=s.min)}qeSaveSoon();qeSync()}))},
  async check(it,ui){const fb=await qeEvalOpen(it,ui);return {ok:true,fb}},
  fb(it,ui){return qeRubricHTML(it,ui)}
 };
@@ -2902,6 +3004,9 @@ async function qeEvalAI(it,ui){
  return null;
 }
 async function qeEvalOpen(it,ui){
+ if(it.id==='sw-case'){
+  return {src:'self',scores:{...ui.self},reasons:Object.fromEntries(RUB.map(d=>[d.k,it.lookFor[d.k]])),total:Object.values(ui.self).reduce((a,b)=>a+b,0)};
+ }
  let r=null;
  if(sampleFn){r=await qeEvalAI(it,ui)}
  if(!r){r=qeDemoRubric(it,ui);if(sampleFn)r.aiFailed=true}
@@ -2909,7 +3014,7 @@ async function qeEvalOpen(it,ui){
 }
 function qeRubricHTML(it,ui){
  const fb=ui.fb;if(!fb)return '';const prev=ui.revs.length>1?ui.revs[ui.revs.length-2]:null;
- const tag=fb.src==='ai'?'<span class="tag acc">AI feedback · checked by a verifier</span>':'<span class="tag xp">Demo feedback · not AI</span>';
+ const tag=fb.src==='self'?'<span class="tag">Self-assessment</span>':fb.src==='ai'?'<span class="tag acc">AI feedback · checked by a verifier</span>':'<span class="tag xp">Demo feedback · not AI</span>';
  let h='<div class="qe-rub"><h3 style="margin-top:6px">Rubric feedback '+tag+'</h3>';
  if(fb.src==='demo')h+='<div class="qe-note"><strong>Demo feedback.</strong> '+(fb.aiFailed?'The AI service did not return a usable answer this time, so this score':'No AI is connected here, so this score')+' comes from a keyword and structure check in your browser. It looks for evidence references, cause-and-effect language, assumptions, trade-offs and a clear recommendation. It cannot tell you whether your conclusion is right, so compare with the strong example below.</div>';
  h+='<p class="mono" style="font-size:20px;margin:6px 0"><strong>'+fb.total+' / 12</strong>'+(prev?' <span class="small muted">(was '+prev.total+')</span>':'')+'</p>';
@@ -2948,6 +3053,7 @@ function viewQE(app){
  if(!isOpen(s.pillar))return lockedView(app,s.pillar);
  const q=QS();let run=q.run[sid];if(!run)run=qeNewRun(sid);
  if(QE.run!==run){QE={sid,run,ui:null,iid:null,busy:false,hint:false,err:null,t0:Date.now(),focus:null}}
+ if(sid==='gr-swiggy'&&!run.firstCall)return firstInvestigation(app,run);
  if(run.done)return qeSummary(app,run,s);
  if(run.stage==='retry-intro')return qeRetryIntro(app,run,s);
  return qeQuestion(app,run,s);
@@ -2959,13 +3065,13 @@ function qeQuestion(app,run,s){
  const pct=Math.round(m/total*100),P=PILLAR[s.pillar];
  const count=run.stage==='retry'?'Retry '+(run.pos+1)+' of '+run.queue.length:'Question '+(run.pos+1)+' of '+total;
  const prompt=item.type==='flashcard'?'What does this term mean?':item.q;
- const stim=item.scenario?'<div class="qe-stim"><p><strong>Scenario.</strong> '+esc(item.scenario)+'</p></div>':'';
+ const stim=s.id==='qd-swiggy'?checkoutTable():item.scenario?'<div class="qe-stim"><p><strong>Scenario.</strong> '+esc(item.scenario)+'</p></div>':'';
  const hint=item.hint?'<button type="button" class="qe-hintb" id="qeHint" aria-expanded="'+QE.hint+'">'+QIC.bulb+' '+(QE.hint?'Hide hint':'Show hint')+'</button>'+(QE.hint?'<div class="qe-hint" role="note">'+esc(item.hint)+'</div>':''):'';
  let fb='';
  if(ui.checked&&item.type!=='flashcard'){const v=ui.verdict||{};const open=OPEN_TYPES.includes(item.type);
   fb='<div class="qe-fb '+(open?'info':v.ok?'ok':v.partial?'part':'bad')+'" id="qeFb" tabindex="-1" role="region" aria-label="Feedback"><h3>'+(open?'Feedback':v.ok?'<span style="color:var(--q-ok)">'+IC.check+'</span> Correct':v.partial?'<span style="color:var(--q-xp)">'+QIC.half+'</span> Partly right':'<span style="color:var(--bad)">'+QIC.cross+'</span> Not quite')+'</h3>'+(ui.timeout?'Time expired before submission.':T.fb(item,ui,v))+qeFbNote(run,item,v)+'<div class="qe-rp"><button type="button" class="link small" id="qeReport">Report a problem</button></div></div>'}
  const err=QE.err?'<p role="alert" style="color:var(--bad);margin:10px 0 0">'+esc(QE.err)+'</p>':'';
- const ai=OPEN_TYPES.includes(item.type)&&!ui.checked?'<div style="margin-top:10px;text-align:right">'+aiBadge()+'</div>':'';
+ const ai=item.id!=='sw-case'&&OPEN_TYPES.includes(item.type)&&!ui.checked?'<div style="margin-top:10px;text-align:right">'+aiBadge()+'</div>':'';
  app.innerHTML='<div class="qe" data-pillar="'+s.pillar+'" data-type="'+item.type+'"><div class="qe-top"><button type="button" class="qe-ib" id="qeExit" aria-label="Exit session. Progress is saved.">'+QIC.x+'</button>'+
   '<div class="qe-prog" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="'+total+'" aria-valuenow="'+m+'" aria-valuetext="'+m+' of '+total+' mastered"><i style="width:'+pct+'%"></i></div>'+
   '<button type="button" class="qe-ib" data-glbrowse="1" aria-label="Open glossary">'+QIC.gl+'</button></div>'+
@@ -3056,7 +3162,7 @@ function qeFbNote(run,item,v){
  return '<p class="small muted qe-fbnote">'+(run.stage==='retry'?'This one is marked as still to review.':'This question comes back once at the end of the session so you can try again.')+'</p>';
 }
 async function qeAct(){
- if(QE.busy||!QE.run)return;if(QE.guard&&Date.now()<QE.guard)return;const {run,item,ui}=qeCtx(),T=QT[item.type];
+ if(QE.busy||!QE.run||QE.run.done)return;if(QE.guard&&Date.now()<QE.guard)return;const {run,item,ui}=qeCtx(),T=QT[item.type];
  if(ui.paused)return;if(ui.timeout)return qeAdvance();
  if(item.type==='flashcard'){if(!ui.flipped){ui.flipped=true;QE.guard=Date.now()+450;qeSave();return qeRerender('#qeAct')}return qeFlashRate(true)}
  if(OPEN_TYPES.includes(item.type)&&ui.editing)return qeSubmitOpen(item,ui,true);
@@ -3071,6 +3177,7 @@ async function qeSubmitOpen(item,ui,revise){
  const T=QT[item.type];QE.busy=true;QE.err=null;qeRerender();
  try{const out=await T.check(item,ui);ui.fb=out.fb;ui.revs.push({scores:out.fb.scores,total:out.fb.total,src:qeOpenText(item,ui)});
   if(!revise){ui.verdict={ok:out.ok,grade:out.grade};ui.checked=true;qeRecord(QE.run,item,{ok:out.ok})}
+  if(item.id==='sw-case')(QE.run.followups??=[]).push({answer:ui.texts.rec,scores:{...out.fb.scores}});
   ui.editing=false;
   const st=QS().item[item.id]||(QS().item[item.id]={seen:0,firstOk:0,miss:0,tag:item.tag});
   st.resp={text:ui.text,texts:ui.texts,opt:ui.opt,total:out.fb.total,scores:out.fb.scores,src:out.fb.src,revs:ui.revs.length};
@@ -3084,6 +3191,7 @@ function qeRevise(){const {item,ui}=qeCtx();ui.editing=true;QE.focus='revise';qe
 function qeFlashRate(knew){const {run,item}=qeCtx();const out={ok:knew};qeRecord(run,item,out);qeAdvance()}
 function qeRecord(run,item,out){
  const q=QS(),s=QSESS[run.sid],r=run.res[item.id]||(run.res[item.id]={att:0,first:null,ok:false});
+ if(run.sid==='qd-swiggy')(r.answers??=[]).push({selection:QE.ui.sel?.slice(),pairs:QE.ui.pair?{...QE.ui.pair}:undefined,correct:!!out.ok,timeout:!!QE.ui.timeout});
  r.att++;if(r.first===null)r.first=!!out.ok;r.ok=r.ok||!!out.ok;r.tag=item.tag;r.type=item.type;
  if(!out.ok&&run.stage==='retry')r.unresolved=true;if(out.ok)r.unresolved=false;
  const st=q.item[item.id]||(q.item[item.id]={seen:0,firstOk:0,miss:0,tag:item.tag});
@@ -3115,7 +3223,7 @@ function durReport(){
   sum[k]=n<3?{n,note:'Not enough completed runs yet for a typical time (needs 3).'}:{n,median_seconds:n%2?a[(n-1)/2]:Math.round((a[n/2-1]+a[n/2])/2),min_seconds:a[0],max_seconds:a[n-1]}});
  return {definition:DUR_NOTE,summary:sum,runs};
 }
-function qeFinish(run){run.done=true;run.stage='done';run.tEnd=Date.now();run.cur=null;checkUnlocks();durLog({kind:'qe_'+run.pillar,id:run.sid,ms:run.ms||0,items:qeTotal(run)},'qe:'+run.sid+':'+run.n);track('qe_done',{sid:run.sid,first:qeFirst(run),total:qeTotal(run),mastered:qeMastered(run),xp:run.xp})}
+function qeFinish(run){if(run.done)return;run.done=true;run.stage='done';run.tEnd=Date.now();run.cur=null;checkUnlocks();durLog({kind:'qe_'+run.pillar,id:run.sid,ms:run.ms||0,items:qeTotal(run)},'qe:'+run.sid+':'+run.n);track('qe_done',{sid:run.sid,first:qeFirst(run),total:qeTotal(run),mastered:qeMastered(run),xp:run.xp})}
 function qeRetryIntro(app,run,s){
  const miss=run.retry.map(id=>QI[id]);
  const names=[...new Set(miss.map(i=>GL[i.tag]?GL[i.tag].t:i.tag))];
@@ -3187,7 +3295,15 @@ function qeImprove(run,s,opens){
  if(low){const it=opens[0];return {text:'Strengthen '+low.d.n.toLowerCase()+' in written answers: '+(it.lookFor&&it.lookFor[low.d.k]||low.d.d),guide:null,term:null}}
  return {text:'No weak spot showed up in this set.',guide:null,term:null};
 }
+function investigationSummary(app,run,s){
+ const attempts=[...(QS().swiggyHistory||[]).filter(r=>r.sid===s.id),run];
+ const review=attempts.map(r=>'<details class="qe-det"'+(r===run?' open':'')+'><summary>Attempt '+r.n+'</summary><p><strong>First investigation</strong></p><p>'+esc(r.firstCall||'')+'</p>'+
+  (r.followups||[]).map((a,i)=>'<h3>Follow-up '+(i+1)+'</h3><p>'+esc(a.answer)+'</p><details><summary>Self-assessment</summary><ul>'+RUB.map(d=>'<li>'+esc(d.n)+' · '+a.scores[d.k]+' / 2</li>').join('')+'</ul></details>').join('')+'</details>').join('');
+ app.innerHTML='<div class="qe qe-sum"><section class="card step-card"><div class="eyebrow">Gym Room · session complete</div><h1>'+esc(s.title)+'</h1><p id="qeOutcome">Investigation complete · +'+run.xp+' XP this attempt</p>'+review+'<div class="row" style="margin-top:16px"><button class="btn primary" id="qeRec" data-go="progress">View Progress</button><button class="btn" id="qeAgain">Practice this set again</button><button class="btn" data-go="cases">Back to Case Simulations</button></div></section></div>';
+ $('#qeAgain').onclick=()=>qeEnter(s.id,true);
+}
 function qeSummary(app,run,s){
+ if(s.id==='gr-swiggy')return investigationSummary(app,run,s);
  const total=qeTotal(run),first=qeFirst(run),m=qeMastered(run),P=PILLAR[s.pillar];
  const unresolved=s.items.filter(i=>!(run.res[i.id]&&run.res[i.id].ok));
  const skipped=unresolved.filter(i=>run.res[i.id]&&run.res[i.id].skipped).length;
@@ -3198,7 +3314,7 @@ function qeSummary(app,run,s){
  const opens=s.items.filter(i=>OPEN_TYPES.includes(i.type)&&run.res[i.id]&&run.res[i.id].scores);
  const missed=s.items.filter(i=>run.res[i.id]&&run.res[i.id].first===false);
  const gl=Object.keys(run.gl||{});
- const rec=qeRecommend(run),str=qeStrength(run,s,byType,opens),imp=qeImprove(run,s,opens);
+ const rec=s.id==='qd-swiggy'?{title:'Swiggy checkout price shock',why:'Use the same checkout evidence to choose an investigation.',qe:'gr-swiggy',cta:'Enter the Gym Room'}:qeRecommend(run),str=qeStrength(run,s,byType,opens),imp=qeImprove(run,s,opens);
  const outcome=mastered?'All '+total+' items are correct: '+first+' on the first try'+(afterRetry?' and '+afterRetry+' after retry':'')+'.'
   :m+' of '+total+' items are correct; '+unresolved.length+' still need review'+(skipped?' ('+skipped+' with the retry skipped)':'')+'.';
  const dOpen=qeWide()?' open':'';
@@ -3212,7 +3328,7 @@ function qeSummary(app,run,s){
   '<h3 style="margin:14px 0 0">Each item</h3><ul class="qe-list" id="qeStates">'+s.items.map(i=>{const st=qeItemState(run,i.id);return '<li data-state="'+st.k+'"><span>'+esc(qeItemTitle(i))+'</span><span class="tag '+(st.k==='first'||st.k==='retry'?'acc':st.k==='none'?'':st.k==='att'||st.k==='skipped'?'xp':'bad')+'">'+st.l+'</span></li>'}).join('')+'</ul>'+
   (missed.length?'<h3 style="margin:14px 0 0">Missed concepts</h3><ul class="qe-list">'+missed.map(i=>{const st=qeItemState(run,i.id),g=TAG_GUIDE[i.tag];return '<li><span>'+(GL[i.tag]?'<button type="button" class="gl" data-gl="'+i.tag+'">'+esc(GL[i.tag].t)+'</button>':esc(i.tag))+'</span><span><span class="tag '+(st.k==='retry'?'acc':st.k==='skipped'?'xp':'bad')+'">'+st.l+'</span>'+(g&&GUIDES[g]?' <button type="button" class="link small" data-go="reads" data-arg="'+g+'">Read</button>':'')+'</span></li>'}).join('')+'</ul>':'')+
   '<h3 style="margin:14px 0 0">By question type</h3><ul class="qe-list">'+Object.entries(byType).map(([t,b])=>'<li><span>'+TYPE_LABEL[t]+'</span><span class="mono">'+b.f+' / '+b.n+' first try</span></li>').join('')+'</ul>'+
-  (opens.length?'<h3 style="margin:14px 0 0">Rubric results</h3>'+opens.map(i=>{const r=run.res[i.id];return '<div class="dimr" style="padding:8px 0;border-top:1px solid var(--line)"><div class="spread"><strong>'+esc(plain(i.q))+'</strong><span class="mono">'+r.rubric+' / 12</span></div><div class="small muted">'+(r.revs>1?r.revs+' versions submitted. ':'1 version submitted. ')+(r.src==='ai'?'AI feedback.':'Demo feedback (not AI).')+'</div></div>'}).join(''):'')+
+  (opens.length?'<h3 style="margin:14px 0 0">Rubric results</h3>'+opens.map(i=>{const r=run.res[i.id];return '<div class="dimr" style="padding:8px 0;border-top:1px solid var(--line)"><div class="spread"><strong>'+esc(plain(i.q))+'</strong><span class="mono">'+r.rubric+' / 12</span></div><div class="small muted">'+(r.revs>1?r.revs+' versions submitted. ':'1 version submitted. ')+(r.src==='self'?'Self-assessment.':r.src==='ai'?'AI feedback.':'Demo feedback (not AI).')+'</div></div>'}).join(''):'')+
   (gl.length?'<h3 style="margin:14px 0 0">Glossary terms you looked up</h3><div class="topics">'+gl.map(k=>'<button type="button" class="gl" data-gl="'+k+'" style="margin-right:10px">'+esc(GL[k].t)+'</button>').join('')+'</div>':'')+
   '</details>'+
   '<div class="row" style="margin-top:14px">'+(unresolved.length?'<button type="button" class="btn" id="qeRetryMissed">'+QIC.retry+' Retry '+unresolved.length+' missed</button>':'')+'<button type="button" class="btn" id="qeAgain">Practice this set again</button><button type="button" class="btn" id="qeBack">Back to '+(qeBackArg(s)?'the guide':P.n)+'</button></div></div></div>';
